@@ -8,13 +8,14 @@ var score = 0;
 var scoreText;
 var HighScore = 0;
 var HighScoreText;
+var worldWidth = 9600;
 
 var gameOver = false;
 
 var config = {
     type: Phaser.AUTO,
     width: 1920,
-    height: 1000,
+    height: 1080,
     parent: game,
     physics: {
         default: 'arcade',
@@ -49,18 +50,31 @@ function preload() {
 }
 
 function create() {
-    this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
-
+    //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
+    this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0);
+    
     platforms = this.physics.add.staticGroup();
-
-    platforms.create(600, 950, 'ground').setScale(3).refreshBody();
-    platforms.create(1400, 950, 'ground').setScale(3).refreshBody();
-
+    
+    for(var x=0; x<worldWidth; x=x+128)
+    {
+        console.log(x);
+        platforms.create(x, 1080-120, 'ground').setOrigin(0, 0).refreshBody();
+    }
 
     player = this.physics.add.sprite(100, 450, 'dude');
-
     player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
+    player.setCollideWorldBounds(false);
+
+    this.cameras.main.setBounds(0, 0, worldWidth, 1080);
+    this.physics.world.setBounds(0, 0, worldWidth, 1080);
+    this.cameras.main.startFollow(player);
+
+    for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
+    {
+        var y = Phaser.Math.FloatBetween(100, 1000);
+        console.log(x, y);
+        platforms.create(x, y, 'ground');
+    }
 
     this.anims.create({
         key: 'left',
@@ -186,7 +200,7 @@ function hitBomb(player, bomb) {
 
     var self = this;
 
-    var resetButton = this.add.image(400, 450, 'reset').setInteractive();
+    var resetButton = this.add.image(960, 800, 'reset').setInteractive();
     resetButton.setScale(1);
 
     resetButton.on('pointerdown', function () {
