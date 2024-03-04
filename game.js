@@ -3,6 +3,9 @@ var platforms;
 var stars;
 var cursors;
 var bombs;
+var rocks;
+var trees;
+var signs;
 
 var score = 0;
 var scoreText;
@@ -39,10 +42,10 @@ function preload() {
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('reset', 'assets/reset.png');
-    this.load.spritesheet('dude',
-        'assets/dude.png',
-        { frameWidth: 32, frameHeight: 48 }
-    );
+    this.load.image('rock', 'assets/rock.png');
+    this.load.image('tree', 'assets/tree.png');
+    this.load.image('sign', 'assets/sign.png');
+    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.audio('boom', 'assets/boom.mp3');
     this.load.audio('death', 'assets/death.mp3');
     this.load.audio('jump', 'assets/jump.mp3');
@@ -61,7 +64,34 @@ function create() {
         platforms.create(x, 1080-120, 'ground').setOrigin(0, 0).refreshBody();
     }
 
-    player = this.physics.add.sprite(100, 450, 'dude');
+    rocks = this.physics.add.staticGroup();
+
+    for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(800, 1200))
+    {
+        var y = 960;
+        console.log(x, y);
+        rocks.create(x, y, 'rock').setOrigin(0, 1).setScale(Phaser.Math.FloatBetween(1, 3));
+    }
+
+    trees = this.physics.add.staticGroup();
+
+    for(var x=200; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 800))
+    {
+        var y = 965;
+        console.log(x, y);
+        trees.create(x, y, 'tree').setOrigin(0, 1).setScale(Phaser.Math.FloatBetween(1, 3));
+    }
+
+    signs = this.physics.add.staticGroup();
+
+    for(var x=500; x<worldWidth; x=x+Phaser.Math.FloatBetween(1000, 1200))
+    {
+        var y = 965;
+        console.log(x, y);
+        signs.create(x, y, 'sign').setOrigin(0, 1).setScale(Phaser.Math.FloatBetween(1, 2));
+    }
+
+    player = this.physics.add.sprite(300, 450, 'dude').setScale(2);
     player.setBounce(0.2);
     player.setCollideWorldBounds(false);
 
@@ -152,7 +182,7 @@ function update() {
     }
 
     if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-330);
+        player.setVelocityY(-500);
         jumpSound.play();
     }
 }
