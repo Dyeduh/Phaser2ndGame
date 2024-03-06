@@ -7,11 +7,11 @@ var rocks;
 var trees;
 var signs;
 
+
 var score = 0;
 var scoreText;
 var HighScore = 0;
 var HighScoreText;
-var worldWidth = 9600;
 
 var gameOver = false;
 
@@ -20,6 +20,7 @@ var config = {
     width: 1920,
     height: 1080,
     parent: game,
+    playerSpeed: 1000,
     physics: {
         default: 'arcade',
         arcade: {
@@ -33,6 +34,8 @@ var config = {
         update: update
     }
 };
+
+var worldWidth = config.width * 2;
 
 var game = new Phaser.Game(config);
 
@@ -166,12 +169,12 @@ function update() {
     }
 
     if (cursors.left.isDown) {
-        player.setVelocityX(-160);
+        player.setVelocityX(-config.playerSpeed);
 
         player.anims.play('left', true);
     }
     else if (cursors.right.isDown) {
-        player.setVelocityX(160);
+        player.setVelocityX(config.playerSpeed);
 
         player.anims.play('right', true);
     }
@@ -197,7 +200,7 @@ function collectStar(player, star) {
 
     var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-    var bomb = bombs.create(x, 16, 'bomb');
+    var bomb = bombs.create(x, 16, 'bomb').setScale(3);
     bomb.setBounce(1);
     bomb.setCollideWorldBounds(true);
     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
