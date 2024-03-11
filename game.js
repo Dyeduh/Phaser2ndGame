@@ -6,12 +6,12 @@ var bombs;
 var rock;
 var tree;
 var sign;
+var dirt;
 
+var lives = 3;
 
 var score = 0;
 var scoreText;
-var HighScore = 0;
-var HighScoreText;
 
 var gameOver = false;
 
@@ -60,9 +60,14 @@ function preload() {
     this.load.image('skyL', 'assets/sky1.png');
     this.load.image('skyC', 'assets/sky2.png');
     this.load.image('skyR', 'assets/sky3.png');
+    
+    this.load.image('dirt', 'assets/dirt.png');
+    
+    this.load.image('heart', 'assets/heart.png');
 }
 
 function create() {
+    this.add.image(100, 100, 'heart');
     //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
     
@@ -74,7 +79,7 @@ function create() {
     for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(800, 1200))
     {
         rock
-            .create(x, 1080-128, 'rock')
+            .create(x, 1080-120, 'rock')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
@@ -87,7 +92,7 @@ function create() {
     for(var x=200; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 800))
     {
         tree
-            .create(x, 1080-128, 'tree')
+            .create(x, 1080-120, 'tree')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
@@ -100,7 +105,7 @@ function create() {
     for(var x=500; x<worldWidth; x=x+Phaser.Math.FloatBetween(1000, 1200))
     {
         sign
-            .create(x, 1080-128, 'sign')
+            .create(x, 1080-120, 'sign')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
@@ -108,7 +113,7 @@ function create() {
             console.log(sign.X, sign.Y)
     }
 
-    player = this.physics.add.sprite(300, 450, 'dude').setScale(1.5);
+    player = this.physics.add.sprite(300, 450, 'dude').setScale(1.5).setDepth(5);
     player
         .setBounce(0.2)
         .setCollideWorldBounds(false)
@@ -121,7 +126,7 @@ function create() {
     for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
     {
         var yStep = Phaser.Math.Between(1, 4);
-        var y = 200 * yStep
+        var y = 205 * yStep
 
         platforms.create(x, y, 'skyL');
 
@@ -138,17 +143,25 @@ for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
     {
         var y = 1020
 
-        platforms.create(x, y, 'floorL');
+        platforms.create(x, y, 'floorL').setDepth(5);
 
         var i;
         for(i = 1; 1 < Phaser.Math.Between(0, 5); i++)
     {
-        platforms.create(x + 128 * i, y, 'floorC')
+        platforms.create(x + 128 * i, y, 'floorC').setDepth(5)
     }
 
-    platforms.create(x + 128 * i, y, 'floorR');
+    platforms.create(x + 128 * i, y, 'floorR').setDepth(5);
 }
 
+dirt = this.physics.add.staticGroup();
+
+for(var x=0; x<worldWidth; x=x+128)
+    {
+        var y = 1020
+
+        dirt.create(x, y, 'dirt').setDepth(1);
+    }
 
     this.anims.create({
         key: 'left',
@@ -176,8 +189,8 @@ for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
 
     stars = this.physics.add.group({
         key: 'star',
-        repeat: 15,
-        setXY: { x:15, y: 0, stepX: 100}
+        repeat: 12,
+        setXY: { x:15, y: 0, stepX: 300}
     });
 
     stars.children.iterate(function (child) {
@@ -189,8 +202,7 @@ for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
     this.physics.add.collider(stars, platforms);
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    scoreText = this.add.text(30, 30, 'Score: 0', { fontSize: '32px', fill: '#000' });
-    HighScoreText = this.add.text(1600, 30, ('High score: ' + HighScore), { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(30, 30, 'Score: 0', { fontSize: '32px', fill: '#000' }).setScrollFactor(0).setOrigin(0,0);
 
     bombs = this.physics.add.group();
 
@@ -206,6 +218,11 @@ for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
 
 function update() {
     if (gameOver) {
+        return;
+    }
+
+    if (player.y >= 1080) {
+        hitBomb(player);
         return;
     }
 
@@ -247,10 +264,6 @@ function collectStar(player, star) {
     bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
     bomb.allowGravity = false;
 
-    if (HighScore < score) {
-        HighScore = score;
-    }
-
     if (stars.countActive(true) === 0) {
         stars.children.iterate(function (child) {
 
@@ -274,19 +287,19 @@ function hitBomb(player, bomb) {
 
     var self = this;
 
-    //var resetButton = this.add.image(960, 800, 'reset').setInteractive();
-    //resetButton.setScale(1);
+    var resetButton = this.add.image(960, 800, 'reset').setInteractive();
+    resetButton.setScrollFactor(0).setOrigin(0,0);
 
-    //resetButton.on('pointerdown', function () {
-    //    self.physics.resume();
-    //    player.disableBody(true, true);
-    //    player = self.physics.add.sprite(100, 450, 'dude').setScale(2);
-    //    player
-    //        .setBounce(0.2)
-    //        .setCollideWorldBounds(true)
-    //        .setDepth(5)
-    //    gameOver = false;
-    //    self.scene.restart();
-    //    score = 0;
-    //});
+    resetButton.on('pointerdown', function () {
+        self.physics.resume();
+        player.disableBody(true, true);
+        player = self.physics.add.sprite(100, 450, 'dude').setScale(2);
+        player
+            .setBounce(0.2)
+            .setCollideWorldBounds(true)
+            .setDepth(5)
+        gameOver = false;
+        self.scene.restart();
+        score = 0;
+    });
 }
