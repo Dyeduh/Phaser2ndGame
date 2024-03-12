@@ -7,8 +7,10 @@ var rock;
 var tree;
 var sign;
 var dirt;
+var resetButton;
 
 var lives = 3;
+var hearts = [];
 
 var score = 0;
 var scoreText;
@@ -64,6 +66,7 @@ function preload() {
     this.load.image('dirt', 'assets/dirt.png');
     
     this.load.image('heart', 'assets/heart.png');
+    this.load.image('noheart', 'assets/noheart.png');
 }
 
 function create() {
@@ -214,6 +217,10 @@ for(var x=0; x<worldWidth; x=x+128)
     deathSound = this.sound.add('death');
     jumpSound = this.sound.add('jump');
     coinSound = this.sound.add('coin');
+
+    for (var i = 0; i < lives; i++) {
+        hearts.push(this.add.image(config.width - 50 - i * 50, 50, 'heart').setScrollFactor(0));
+    }
 }
 
 function update() {
@@ -222,7 +229,6 @@ function update() {
     }
 
     if (player.y >= 1080) {
-        hitBomb(player);
         return;
     }
 
@@ -274,32 +280,58 @@ function collectStar(player, star) {
 }
 
 function hitBomb(player, bomb) {
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-
     deathSound.play();
     boomSound.play();
+    player.anims.stop();
+    player.setTexture('dude');
 
-    player.anims.play('turn');
+    lives--;
 
-    gameOver = true;
+    if (lives <= 0) {
+        this.physics.pause();
 
-    var self = this;
+        player.setTint(0xff0000);
 
-    var resetButton = this.add.image(960, 800, 'reset').setInteractive();
-    resetButton.setScrollFactor(0).setOrigin(0,0);
+        player.anims.play('turn');
 
-    resetButton.on('pointerdown', function () {
-        self.physics.resume();
-        player.disableBody(true, true);
-        player = self.physics.add.sprite(100, 450, 'dude').setScale(2);
-        player
-            .setBounce(0.2)
-            .setCollideWorldBounds(true)
-            .setDepth(5)
-        gameOver = false;
-        self.scene.restart();
-        score = 0;
+        gameOver = true;
+
+        var self = this;
+
+        var resetButton = this.add.image(791, 800, 'reset').setInteractive();
+    resetButton.setScale(1);
+
+        resetButton.on('pointerdown', function () {
+            self.physics.resume();
+            player.disableBody(true, true);
+            player = self.physics.add.sprite(100, 450, 'dude');
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            gameOver = false;
+            self.scene.restart();
+            score = 0;
+            lives = 3;
+        });
+    } else {
+        var heartIndex = hearts.length - lives - 1;
+        hearts[heartIndex].setTexture('noheart');
+    }
+
+    bomb.disableBody(true, true);
+}
+
+function updateHearts() {
+    hearts.forEach(function (heart) {
+        heart.destroy();
     });
+
+    hearts = [];
+
+    for (var i = 0; i < lives; i++) {
+        hearts.push(this.add.image(config.width - 50 - i * 50, 50, 'heart'));
+    }
+
+    for (var i = lives; i < 3; i++) {
+        hearts.push(this.add.image(config.width - 50 - i * 50, 50, 'noheart'));
+    }
 }
