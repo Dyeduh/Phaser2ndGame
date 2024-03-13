@@ -239,10 +239,6 @@ function update() {
         return;
     }
 
-    if (player.y >= 1080) {
-        return;
-    }
-
     if (cursors.left.isDown) {
         player.setVelocityX(-config.playerSpeed);
 
