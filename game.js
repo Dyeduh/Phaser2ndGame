@@ -67,15 +67,24 @@ function preload() {
     
     this.load.image('heart', 'assets/heart.png');
     this.load.image('noheart', 'assets/noheart.png');
+    this.load.image('zone', 'assets/zone.png');
 }
 
 function create() {
-    this.add.image(100, 100, 'heart');
     //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
     
     platforms = this.physics.add.staticGroup();
-    
+
+    zone = this.physics.add.staticGroup();
+
+    for(var x=0; x<worldWidth; x=x+700)
+    {
+        zone
+            .create(x, 1080, 'zone')
+            .setDepth(2)
+            console.log(zone.X, zone.Y)
+    }
 
     rock = this.physics.add.staticGroup();
 
@@ -142,7 +151,7 @@ function create() {
     platforms.create(x + 128 * i, y, 'skyR');
 }
 
-for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
+for(var x=200; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
     {
         var y = 1020
 
@@ -212,6 +221,8 @@ for(var x=0; x<worldWidth; x=x+128)
     this.physics.add.collider(bombs, platforms);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
+
+    this.physics.add.collider(player, zone, underGround, null, this);
 
     boomSound = this.sound.add('boom');
     deathSound = this.sound.add('death');
@@ -334,4 +345,31 @@ function updateHearts() {
     for (var i = lives; i < 3; i++) {
         hearts.push(this.add.image(config.width - 50 - i * 50, 50, 'noheart'));
     }
+}
+
+function underGround () {
+    this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        player.anims.play('turn');
+
+        gameOver = true;
+
+        var self = this;
+
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+    resetButton.setScale(1);
+
+        resetButton.on('pointerdown', function () {
+            self.physics.resume();
+            player.disableBody(true, true);
+            player = self.physics.add.sprite(100, 450, 'dude');
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            gameOver = false;
+            self.scene.restart();
+            score = 0;
+            lives = 3;
+        });
 }
