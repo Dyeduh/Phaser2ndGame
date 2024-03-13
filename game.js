@@ -298,7 +298,7 @@ function hitBomb(player, bomb) {
 
         var self = this;
 
-        var resetButton = this.add.image(791, 800, 'reset').setInteractive();
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
     resetButton.setScale(1);
 
         resetButton.on('pointerdown', function () {
