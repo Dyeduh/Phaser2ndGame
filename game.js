@@ -68,9 +68,13 @@ function preload() {
     this.load.image('heart', 'assets/heart.png');
     this.load.image('noheart', 'assets/noheart.png');
     this.load.image('zone', 'assets/zone.png');
+    this.load.image('zone1', 'assets/zone1.png');
 }
 
 function create() {
+    zones = this.physics.add.staticGroup();
+    zones.create(-200, 100, 'zone1').setScale(2).setDepth(1);
+    zones.create(worldWidth+200, 100, 'zone1').setScale(2).setDepth(1);
     //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
     
@@ -78,7 +82,7 @@ function create() {
 
     zone = this.physics.add.staticGroup();
 
-    for(var x=0; x<worldWidth; x=x+700)
+    for(var x=-500; x<worldWidth+500; x=x+700)
     {
         zone
             .create(x, 1080, 'zone')
@@ -224,6 +228,8 @@ for(var x=0; x<worldWidth; x=x+128)
 
     this.physics.add.collider(player, zone, underGround, null, this);
 
+    this.physics.add.collider(player, zones, underGround, null, this);
+
     boomSound = this.sound.add('boom');
     deathSound = this.sound.add('death');
     jumpSound = this.sound.add('jump');
@@ -269,7 +275,7 @@ function collectStar(player, star) {
     score += 1;
     scoreText.setText('Score: ' + score);
 
-    var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+    var x = Phaser.Math.Between(0, worldWidth);
 
     var bomb = bombs.create(x, 16, 'bomb').setScale(3);
     bomb.setBounce(1);
