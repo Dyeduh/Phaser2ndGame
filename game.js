@@ -62,71 +62,69 @@ function preload() {
     this.load.image('skyL', 'assets/sky1.png');
     this.load.image('skyC', 'assets/sky2.png');
     this.load.image('skyR', 'assets/sky3.png');
-    
+
     this.load.image('dirt', 'assets/dirt.png');
-    
+
     this.load.image('heart', 'assets/heart.png');
     this.load.image('noheart', 'assets/noheart.png');
     this.load.image('zone', 'assets/zone.png');
     this.load.image('zone1', 'assets/zone1.png');
+
+    this.load.image('stone', 'assets/stone.png');
 }
 
 function create() {
     zones = this.physics.add.staticGroup();
-    zones.create(-200, 100, 'zone1').setScale(2).setDepth(1);
-    zones.create(worldWidth+200, 100, 'zone1').setScale(2).setDepth(1);
+    zones.create(-200, 300, 'zone1').setScale(2).setDepth(1);
+    zones.create(worldWidth + 200, 300, 'zone1').setScale(2).setDepth(1);
     //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
-    
+
     platforms = this.physics.add.staticGroup();
 
     zone = this.physics.add.staticGroup();
 
-    for(var x=-500; x<worldWidth+500; x=x+700)
-    {
+    for (var x = -500; x < worldWidth + 1000; x = x + 700) {
         zone
             .create(x, 1080, 'zone')
             .setDepth(2)
-            console.log(zone.X, zone.Y)
+        console.log(zone.X, zone.Y)
     }
 
     rock = this.physics.add.staticGroup();
 
-    for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(800, 1200))
-    {
+    for (var x = 0; x < worldWidth; x = x + Phaser.Math.FloatBetween(800, 1200)) {
         rock
-            .create(x, 1080-120, 'rock')
+            .create(x, 1080 - 120, 'rock')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
 
-            console.log(rock.X, rock.Y)
+        console.log(rock.X, rock.Y)
     }
 
     tree = this.physics.add.staticGroup();
 
-    for(var x=200; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 800))
-    {
+    for (var x = 200; x < worldWidth; x = x + Phaser.Math.FloatBetween(400, 800)) {
         tree
-            .create(x, 1080-120, 'tree')
+            .create(x, 1080 - 120, 'tree')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
 
-            console.log(tree.X, tree.Y)
+        console.log(tree.X, tree.Y)
     }
 
     sign = this.physics.add.staticGroup();
 
-    for(var x=500; x<worldWidth; x=x+Phaser.Math.FloatBetween(1000, 1200))
-    {
+    for (var x = 500; x < worldWidth; x = x + Phaser.Math.FloatBetween(1000, 1200)) {
         sign
-            .create(x, 1080-120, 'sign')
+            .create(x, 1080 - 120, 'sign')
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(1, 10));
 
-            console.log(sign.X, sign.Y)
+        console.log(sign.X, sign.Y)
     }
 
     player = this.physics.add.sprite(300, 450, 'dude').setScale(1.5).setDepth(5);
@@ -139,41 +137,36 @@ function create() {
     this.physics.world.setBounds(0, 0, worldWidth, 1080);
     this.cameras.main.startFollow(player);
 
-    for(var x=0; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
-    {
+    for (var x = 0; x < worldWidth; x = x + Phaser.Math.FloatBetween(400, 500)) {
         var yStep = Phaser.Math.Between(1, 4);
         var y = 205 * yStep
 
         platforms.create(x, y, 'skyL');
 
         var i;
-        for(i = 1; 1 < Phaser.Math.Between(0, 5); i++)
-    {
-        platforms.create(x + 128 * i, y, 'skyC')
+        for (i = 1; 1 < Phaser.Math.Between(0, 5); i++) {
+            platforms.create(x + 128 * i, y, 'skyC')
+        }
+
+        platforms.create(x + 128 * i, y, 'skyR');
     }
 
-    platforms.create(x + 128 * i, y, 'skyR');
-}
-
-for(var x=200; x<worldWidth; x=x+Phaser.Math.FloatBetween(400, 500))
-    {
+    for (var x = 200; x < worldWidth; x = x + Phaser.Math.FloatBetween(400, 500)) {
         var y = 1020
 
         platforms.create(x, y, 'floorL').setDepth(5);
 
         var i;
-        for(i = 1; 1 < Phaser.Math.Between(0, 5); i++)
-    {
-        platforms.create(x + 128 * i, y, 'floorC').setDepth(5)
+        for (i = 1; 1 < Phaser.Math.Between(0, 5); i++) {
+            platforms.create(x + 128 * i, y, 'floorC').setDepth(5)
+        }
+
+        platforms.create(x + 128 * i, y, 'floorR').setDepth(5);
     }
 
-    platforms.create(x + 128 * i, y, 'floorR').setDepth(5);
-}
+    dirt = this.physics.add.staticGroup();
 
-dirt = this.physics.add.staticGroup();
-
-for(var x=0; x<worldWidth; x=x+128)
-    {
+    for (var x = 0; x < worldWidth; x = x + 128) {
         var y = 1020
 
         dirt.create(x, y, 'dirt').setDepth(1);
@@ -206,7 +199,7 @@ for(var x=0; x<worldWidth; x=x+128)
     stars = this.physics.add.group({
         key: 'star',
         repeat: 12,
-        setXY: { x:15, y: 0, stepX: 300}
+        setXY: { x: 15, y: 0, stepX: 300 }
     });
 
     stars.children.iterate(function (child) {
@@ -218,7 +211,7 @@ for(var x=0; x<worldWidth; x=x+128)
     this.physics.add.collider(stars, platforms);
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    scoreText = this.add.text(30, 30, 'Score: 0', { fontSize: '32px', fill: '#000' }).setScrollFactor(0).setOrigin(0,0);
+    scoreText = this.add.text(30, 30, 'Score: 0', { fontSize: '32px', fill: '#000' }).setScrollFactor(0).setOrigin(0, 0);
 
     bombs = this.physics.add.group();
 
@@ -312,7 +305,7 @@ function hitBomb(player, bomb) {
         var self = this;
 
         var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
-    resetButton.setScale(1);
+        resetButton.setScale(1);
 
         resetButton.on('pointerdown', function () {
             self.physics.resume();
@@ -349,29 +342,29 @@ function updateHearts() {
     }
 }
 
-function underGround () {
+function underGround() {
     this.physics.pause();
 
-        player.setTint(0xff0000);
+    player.setTint(0xff0000);
 
-        player.anims.play('turn');
+    player.anims.play('turn');
 
-        gameOver = true;
+    gameOver = true;
 
-        var self = this;
+    var self = this;
 
-        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+    var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
     resetButton.setScale(1);
 
-        resetButton.on('pointerdown', function () {
-            self.physics.resume();
-            player.disableBody(true, true);
-            player = self.physics.add.sprite(100, 450, 'dude');
-            player.setBounce(0.2);
-            player.setCollideWorldBounds(true);
-            gameOver = false;
-            self.scene.restart();
-            score = 0;
-            lives = 3;
-        });
+    resetButton.on('pointerdown', function () {
+        self.physics.resume();
+        player.disableBody(true, true);
+        player = self.physics.add.sprite(100, 450, 'dude');
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+        gameOver = false;
+        self.scene.restart();
+        score = 0;
+        lives = 3;
+    });
 }
