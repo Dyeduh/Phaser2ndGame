@@ -9,6 +9,10 @@ var sign;
 var dirt;
 var resetButton;
 
+var enemies;
+var enemiesR
+var bullets;
+
 var lives = 3;
 var hearts = [];
 
@@ -70,13 +74,16 @@ function preload() {
     this.load.image('zone', 'assets/zone.png');
     this.load.image('zone1', 'assets/zone1.png');
 
-    this.load.image('stone', 'assets/stone.png');
+    this.load.image('bullett', 'assets/stone.png');
+    this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 48, frameHeight: 32 });
+    this.load.spritesheet('enemyR', 'assets/enemyR.png', { frameWidth: 48, frameHeight: 32 });
 }
 
 function create() {
     zones = this.physics.add.staticGroup();
     zones.create(-200, 300, 'zone1').setScale(2).setDepth(1);
     zones.create(worldWidth + 200, 300, 'zone1').setScale(2).setDepth(1);
+
     //this.add.image(0, 0, 'sky').setOrigin(0,0).setScale(1);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
 
@@ -166,7 +173,7 @@ function create() {
 
     dirt = this.physics.add.staticGroup();
 
-    for (var x = 0; x < worldWidth; x = x + 128) {
+    for (var x = 0; x < worldWidth + 128; x = x + 128) {
         var y = 1020
 
         dirt.create(x, y, 'dirt').setDepth(1);
@@ -231,6 +238,44 @@ function create() {
     for (var i = 0; i < lives; i++) {
         hearts.push(this.add.image(config.width - 50 - i * 50, 50, 'heart').setScrollFactor(0));
     }
+
+    bullets = this.physics.add.group();
+
+    this.physics.add.collider(bullets, platforms, function (bullet) {
+        bullet.destroy();
+    }, null, this);
+
+    this.input.on('pointerdown', function (pointer) {
+        if (pointer.leftButtonDown()) {
+            fireBullet();
+        }
+    }, this);
+
+    this.physics.add.overlap(bullets, tree, destroyBulletAndObject, null, this);
+    this.physics.add.overlap(bullets, bombs, destroyBulletAndObject, null, this);
+    this.physics.add.overlap(bullets, rock, destroyBulletAndObject, null, this);
+    this.physics.add.overlap(bullets, sign, destroyBulletAndObject, null, this);
+
+    enemies = this.physics.add.group();
+    spawnEnemy(worldWidth - 500, 900);
+
+    enemiesR = this.physics.add.group();
+    spawnEnemyR(500, 900);
+    
+    this.physics.add.overlap(bullets, enemies, destroyBulletAndObject, null, this);
+
+    this.physics.add.collider(player, enemies, hitEnemy, null, this);
+
+    this.physics.add.collider(enemies, platforms);
+    this.physics.add.collider(enemies, dirt);
+
+
+    this.physics.add.overlap(bullets, enemiesR, destroyBulletAndObject, null, this);
+
+    this.physics.add.collider(player, enemiesR, hitEnemyR, null, this);
+
+    this.physics.add.collider(enemiesR, platforms);
+    this.physics.add.collider(enemiesR, dirt);
 }
 
 function update() {
@@ -367,4 +412,117 @@ function underGround() {
         score = 0;
         lives = 3;
     });
+}
+
+function fireBullet() {
+    var bullet = bullets.create(player.x, player.y, 'bullett');
+    bullet.setScale(0.3).setVelocityX(player.flipX ? -500 : 500);
+    bullet.setVelocityX(-config.playerSpeed);
+
+    var bullet = bullets.create(player.x, player.y, 'bullett');
+    bullet.setScale(0.3).setVelocityX(player.flipX ? -500 : 500);
+    bullet.setVelocityX(config.playerSpeed);
+}
+function destroyBulletAndObject(bullet, object) {
+    bullet.destroy();
+    object.destroy();
+}
+
+function spawnEnemy(x, y) {
+    var enemy = enemies.create(x, y, 'enemy').setScale(1.5);
+    enemy.setCollideWorldBounds(true);
+    enemy.setVelocityX(-200);
+    enemy.setDepth(5);
+    enemy.on('destroy', function() {
+        spawnEnemy(worldWidth - 500, 900);
+    });
+}
+
+function hitEnemy(player, enemy) {
+    deathSound.play();
+    enemy.destroy();
+    player.anims.stop();
+    player.setTexture('dude');
+
+    lives--;
+
+    if (lives <= 0) {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        player.anims.play('turn');
+
+        gameOver = true;
+
+        var self = this;
+
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+        resetButton.setScale(1);
+
+        resetButton.on('pointerdown', function () {
+            self.physics.resume();
+            player.disableBody(true, true);
+            player = self.physics.add.sprite(100, 450, 'dude');
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            gameOver = false;
+            self.scene.restart();
+            score = 0;
+            lives = 3;
+        });
+    } else {
+        var heartIndex = hearts.length - lives - 1;
+        hearts[heartIndex].setTexture('noheart');
+    }
+}
+
+
+function spawnEnemyR(x, y) {
+    var enemyR = enemiesR.create(x, y, 'enemyR').setScale(1.5);
+    enemyR.setCollideWorldBounds(true);
+    enemyR.setVelocityX(200);
+    enemyR.setDepth(5);
+    enemyR.on('destroy', function() {
+        spawnEnemyR(500, 900);
+    });
+}
+
+function hitEnemyR(player, enemyR) {
+    deathSound.play();
+    enemyR.destroy();
+    player.anims.stop();
+    player.setTexture('dude');
+
+    lives--;
+
+    if (lives <= 0) {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        player.anims.play('turn');
+
+        gameOver = true;
+
+        var self = this;
+
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+        resetButton.setScale(1);
+
+        resetButton.on('pointerdown', function () {
+            self.physics.resume();
+            player.disableBody(true, true);
+            player = self.physics.add.sprite(100, 450, 'dude');
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+            gameOver = false;
+            self.scene.restart();
+            score = 0;
+            lives = 3;
+        });
+    } else {
+        var heartIndex = hearts.length - lives - 1;
+        hearts[heartIndex].setTexture('noheart');
+    }
 }
