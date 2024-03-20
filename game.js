@@ -83,8 +83,8 @@ function preload() {
 
 function create() {
     zones = this.physics.add.staticGroup();
-    zones.create(-200, 300, 'zone1').setScale(2).setDepth(1);
-    zones.create(worldWidth + 200, 300, 'zone1').setScale(2).setDepth(1);
+    zones.create(-200, 300, 'zone1').setScale(2).setDepth(4);
+    zones.create(worldWidth + 200, 300, 'zone1').setScale(2).setDepth(4);
 
     this.add.image(0, 0, 'sky_').setOrigin(0,0).setScale(1).setDepth(2);
     this.add.image(worldWidth - 589, 0, 'sky__').setOrigin(0,0).setScale(1).setDepth(2);
@@ -97,7 +97,7 @@ function create() {
     for (var x = -500; x < worldWidth + 1000; x = x + 700) {
         zone
             .create(x, 1080, 'zone')
-            .setDepth(2)
+            .setDepth(4)
         console.log(zone.X, zone.Y)
     }
 
