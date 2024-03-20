@@ -432,11 +432,11 @@ function underGround() {
 
 function fireBullet() {
     var bullet = bullets.create(player.x, player.y, 'bullett');
-    bullet.setScale(0.3).setVelocityX(player.flipX ? -500 : 500);
+    bullet.setScale(0.3).setDepth(4).setVelocityX(player.flipX ? -500 : 500);
     bullet.setVelocityX(-config.playerSpeed);
 
     var bullet = bullets.create(player.x, player.y, 'bullett');
-    bullet.setScale(0.3).setVelocityX(player.flipX ? -500 : 500);
+    bullet.setScale(0.3).setDepth(4).setVelocityX(player.flipX ? -500 : 500);
     bullet.setVelocityX(config.playerSpeed);
 }
 function destroyBulletAndObject(bullet, object) {
