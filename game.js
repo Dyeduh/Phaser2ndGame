@@ -365,7 +365,7 @@ function hitBomb(player, bomb) {
 
         var self = this;
 
-        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0).setDepth(15);
         resetButton.setScale(1);
 
         resetButton.on('pointerdown', function () {
@@ -414,7 +414,7 @@ function underGround() {
 
     var self = this;
 
-    var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+    var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0).setDepth(15);
     resetButton.setScale(1);
 
     resetButton.on('pointerdown', function () {
@@ -473,7 +473,7 @@ function hitEnemy(player, enemy) {
 
         var self = this;
 
-        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0).setDepth(15);
         resetButton.setScale(1);
 
         resetButton.on('pointerdown', function () {
@@ -523,7 +523,7 @@ function hitEnemyR(player, enemyR) {
 
         var self = this;
 
-        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0);
+        var resetButton = this.add.image(900, 800, 'reset').setInteractive().setScrollFactor(0).setDepth(15);
         resetButton.setScale(1);
 
         resetButton.on('pointerdown', function () {
