@@ -228,8 +228,8 @@ function create() {
 
     stars.children.iterate(function (child) {
 
-        child.setBounceY(Phaser.Math.FloatBetween(0, 0.1));
-        child.setDepth(5)
+        child.setBounceY(Phaser.Math.FloatBetween(0.5, 1));
+        child.setDepth(5).setScale(1.5);
 
     });
 
@@ -335,8 +335,6 @@ function update() {
             enemyR.destroy();
         }
     });
-
-    
 }
 
 function collectStar(player, star) {
