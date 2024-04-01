@@ -5,6 +5,7 @@ var cursors;
 var bombs;
 var rock;
 var tree;
+var batut;
 var sign;
 var dirt;
 var resetButton;
@@ -47,8 +48,6 @@ var game = new Phaser.Game(config);
 
 function preload() {
     this.load.image('sky', 'assets/sky.png');
-    this.load.image('sky_', 'assets/sky_.png');
-    this.load.image('sky__', 'assets/sky__.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('reset', 'assets/reset.png');
@@ -79,16 +78,19 @@ function preload() {
     this.load.image('bullett', 'assets/stone.png');
     this.load.spritesheet('enemy', 'assets/enemy.png', { frameWidth: 48, frameHeight: 32 });
     this.load.spritesheet('enemyR', 'assets/enemyR.png', { frameWidth: 48, frameHeight: 32 });
+    this.load.image('portal', 'assets/portal.png');
+    this.load.image('batut', 'assets/batut.png');
 }
 
 function create() {
     zones = this.physics.add.staticGroup();
     zones.create(-200, 300, 'zone1').setScale(2).setDepth(4);
     zones.create(worldWidth + 200, 300, 'zone1').setScale(2).setDepth(4);
-
-    this.add.image(0, 0, 'sky_').setOrigin(0,0).setScale(1).setDepth(2);
-    this.add.image(worldWidth - 589, 0, 'sky__').setOrigin(0,0).setScale(1).setDepth(2);
     this.add.tileSprite(0, 0, worldWidth, 1080, 'sky').setOrigin(0, 0).setScale(1).setDepth(0);
+
+    this.add.image(500, 880, 'portal').setDepth(20).setScale(0.4);
+    this.add.image(worldWidth - 500, 880, 'portal').setDepth(20).setScale(0.4);
+
 
     platforms = this.physics.add.staticGroup();
 
@@ -109,6 +111,18 @@ function create() {
             .setOrigin(0, 1)
             .setScale(Phaser.Math.FloatBetween(0.5, 2))
             .setDepth(Phaser.Math.Between(3, 10));
+
+        console.log(rock.X, rock.Y)
+    }
+
+    batut = this.physics.add.staticGroup();
+
+    for (var x = 260; x < worldWidth; x = x + Phaser.Math.FloatBetween(1500, 2000)) {
+        batut
+            .create(x, 1080 - 120, 'batut')
+            .setOrigin(0, 1)
+            .setScale(0.3)
+            .setDepth(11);
 
         console.log(rock.X, rock.Y)
     }
@@ -261,10 +275,10 @@ function create() {
     this.physics.add.overlap(bullets, sign, destroyBulletAndObject, null, this);
 
     enemies = this.physics.add.group();
-    spawnEnemy(worldWidth - 500, 900);
+    spawnEnemy(worldWidth - 500, 910);
 
     enemiesR = this.physics.add.group();
-    spawnEnemyR(500, 900);
+    spawnEnemyR(500, 910);
     
     this.physics.add.overlap(bullets, enemies, destroyBulletAndObject, null, this);
 
@@ -280,6 +294,8 @@ function create() {
 
     this.physics.add.collider(enemiesR, platforms);
     this.physics.add.collider(enemiesR, dirt);
+
+    this.physics.add.collider(player, batut, touchBatut, null, this);
 }
 
 function update() {
@@ -309,16 +325,18 @@ function update() {
     }
 
     enemies.children.iterate(function (enemy) {
-        if (enemy.x <= 100) {
+        if (enemy.x <= 500) {
             enemy.destroy();
         }
     });
 
     enemiesR.children.iterate(function (enemyR) {
-        if (enemyR.x >= worldWidth - 100) {
+        if (enemyR.x >= worldWidth - 500) {
             enemyR.destroy();
         }
     });
+
+    
 }
 
 function collectStar(player, star) {
@@ -450,7 +468,7 @@ function spawnEnemy(x, y) {
     enemy.setVelocityX(-200);
     enemy.setDepth(1);
     enemy.on('destroy', function() {
-        spawnEnemy(worldWidth - 500, 900);
+        spawnEnemy(worldWidth - 500, 910);
     });
 }
 
@@ -500,7 +518,7 @@ function spawnEnemyR(x, y) {
     enemyR.setVelocityX(200);
     enemyR.setDepth(1);
     enemyR.on('destroy', function() {
-        spawnEnemyR(500, 900);
+        spawnEnemyR(500, 910);
     });
 }
 
@@ -540,5 +558,11 @@ function hitEnemyR(player, enemyR) {
     } else {
         var heartIndex = hearts.length - lives - 1;
         hearts[heartIndex].setTexture('noheart');
+    }
+}
+
+function touchBatut(player, batut) {
+    if (player.y >= 0) {
+        player.y = 0;
     }
 }
